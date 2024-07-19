@@ -1,3 +1,4 @@
+import { request, response } from "express";
 import File from "../models/file.js";
 
 
@@ -8,7 +9,8 @@ export const uploadImage=async (request,response)=>{
     }
     try{
       const file= await File.create(fileObj);
-      response.status(200).json({path:'http://localhost:3000/file/${file._id}'})
+      console.log(file._id)
+      response.status(200).json({path:`http://localhost:8000/file/${file._id}`})
     }
     catch(error){
         console.error(error.message);
@@ -19,6 +21,9 @@ export const uploadImage=async (request,response)=>{
 export const downloadImage = async(request,response) =>{
     try{
    const file = await  File.findById(request.params.fileId);
+   if (!file) {
+    return res.status(404).json({ error: 'File not found' });
+}
    file.downloadContent++;
    await file.save();
    response.download(file.path,file.name);
